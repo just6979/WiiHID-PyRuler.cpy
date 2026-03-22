@@ -79,7 +79,10 @@ def type_alt_code(code):
     kbd.release_all()
 
 
-nc_retry_delay = 2
+key_repeat_delay = .25
+key_last_repeat = 0
+
+nc_retry_delay = 5
 nc_last_retry = 0
 
 print(gc.mem_free())
@@ -88,7 +91,7 @@ while True:
     now = monotonic()
     if (not nc) and (now - nc_last_retry >= nc_retry_delay):
         nc_last_retry = now
-        print("Checking Nunchuk")
+        # print("Checking Nunchuk")
         try:
             nc = Nunchuk(board.I2C())
             # print("Nunchuk Found")
@@ -97,67 +100,72 @@ while True:
             # print("Nunchuk Missing")
             status_led.value = False
 
-    caps = read_caps()
-    # print(caps)
-    # light up the matching LED
-    for i, c in enumerate(caps):
-        leds[i].value = c
-    if caps[0]:
-        if OS == WINDOWS:
-            type_alt_code(234)
-        elif OS == MAC:
-            kbd.send(0xE2, 0x1D)  # ALT Z
-        elif OS == LINUX:
-            kbd.press(0xE0, 0xE1)  # CTRL SHIFT
-            kbd.press(0x18)  # U
-            kbd.release_all()
-            kbd.send(0x1F)  # TWO
-            kbd.send(0x1E)  # ONE
-            kbd.send(0x1F)  # TWO
-            kbd.send(0x23)  # SIX
-            kbd.send(0x28)  # ENTER
-    if caps[1]:
-        if OS == WINDOWS:
-            type_alt_code(230)
-        elif OS == MAC:
-            kbd.send(0xE2, 0x10)  # ALT, M
-        elif OS == LINUX:
-            kbd.press(0xE0, 0xE1)  # CTRL SHIFT
-            kbd.press(0x18)  # U
-            kbd.release_all()
-            kbd.send(0x27)  # 0
-            kbd.send(0x20)  # 3
-            kbd.send(0x05)  # B
-            kbd.send(0x06)  # C
-            kbd.send(0x28)  # ENTER
-    if caps[2]:
-        if OS == WINDOWS:
-            type_alt_code(227)
-        elif OS == MAC:
-            kbd.send(0xE2, 0x13)  # ALT P
-        elif OS == LINUX:
-            kbd.press(0xE0, 0xE1)  # CRTL SHIFT
-            kbd.press(0x18)  # U
-            kbd.release_all()
-            kbd.send(0x27)  # 0
-            kbd.send(0x20)  # 3
-            kbd.send(0x06)  # C
-            kbd.send(0x27)  # 0
-            kbd.send(0x28)  # ENTER
-    if caps[3]:
-        if OS == WINDOWS:
-            type_alt_code(231)
-        elif OS == MAC:
-            pass
-        elif OS == LINUX:
-            kbd.press(0xE0, 0xE1)  # CTRL SHIFT
-            kbd.press(0x18)  # U
-            kbd.release_all()
-            kbd.send(0x27)  # 0
-            kbd.send(0x20)  # 3
-            kbd.send(0x06)  # C
-            kbd.send(0x21)  # 4
-            kbd.send(0x28)  # ENTER
+    for led in leds:
+        led.value = False
+
+    if now - key_last_repeat >= key_repeat_delay:
+        key_last_repeat = now
+        caps = read_caps()
+        # print(caps)
+        # light up the matching LED
+        for i, c in enumerate(caps):
+            leds[i].value = c
+        if caps[0]:
+            if OS == WINDOWS:
+                type_alt_code(234)
+            elif OS == MAC:
+                kbd.send(0xE2, 0x1D)  # ALT Z
+            elif OS == LINUX:
+                kbd.press(0xE0, 0xE1)  # CTRL SHIFT
+                kbd.press(0x18)  # U
+                kbd.release_all()
+                kbd.send(0x1F)  # TWO
+                kbd.send(0x1E)  # ONE
+                kbd.send(0x1F)  # TWO
+                kbd.send(0x23)  # SIX
+                kbd.send(0x28)  # ENTER
+        if caps[1]:
+            if OS == WINDOWS:
+                type_alt_code(230)
+            elif OS == MAC:
+                kbd.send(0xE2, 0x10)  # ALT, M
+            elif OS == LINUX:
+                kbd.press(0xE0, 0xE1)  # CTRL SHIFT
+                kbd.press(0x18)  # U
+                kbd.release_all()
+                kbd.send(0x27)  # 0
+                kbd.send(0x20)  # 3
+                kbd.send(0x05)  # B
+                kbd.send(0x06)  # C
+                kbd.send(0x28)  # ENTER
+        if caps[2]:
+            if OS == WINDOWS:
+                type_alt_code(227)
+            elif OS == MAC:
+                kbd.send(0xE2, 0x13)  # ALT P
+            elif OS == LINUX:
+                kbd.press(0xE0, 0xE1)  # CRTL SHIFT
+                kbd.press(0x18)  # U
+                kbd.release_all()
+                kbd.send(0x27)  # 0
+                kbd.send(0x20)  # 3
+                kbd.send(0x06)  # C
+                kbd.send(0x27)  # 0
+                kbd.send(0x28)  # ENTER
+        if caps[3]:
+            if OS == WINDOWS:
+                type_alt_code(231)
+            elif OS == MAC:
+                pass
+            elif OS == LINUX:
+                kbd.press(0xE0, 0xE1)  # CTRL SHIFT
+                kbd.press(0x18)  # U
+                kbd.release_all()
+                kbd.send(0x27)  # 0
+                kbd.send(0x20)  # 3
+                kbd.send(0x06)  # C
+                kbd.send(0x21)  # 4
+                kbd.send(0x28)  # ENTER
 
     if nc:
         try:
@@ -185,3 +193,5 @@ while True:
         except OSError:
             # print("Nunchuk Gone")
             nc = None
+
+    sleep(0.001)

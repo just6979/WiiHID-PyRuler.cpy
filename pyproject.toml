@@ -6,4 +6,5 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "adafruit-circuitpython-hid>=6.1.8",
+    "circuitpython-wiichuck>=0.0.3",
 ]

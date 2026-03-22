@@ -7,6 +7,7 @@ import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.mouse import Mouse
 from digitalio import DigitalInOut, Direction
+from wiichuck.nunchuk import Nunchuk
 
 WINDOWS = "W"
 MAC = "M"
@@ -23,6 +24,8 @@ sensitivity = 33
 do_clicks = True
 left_down = False
 right_down = False
+
+nc = None
 
 status_led = DigitalInOut(board.LED)
 status_led.direction = Direction.OUTPUT
@@ -76,7 +79,25 @@ def type_alt_code(code):
         kbd.release(keycode)
     kbd.release_all()
 
+
+nc_retry_delay = 2
+nc_last_retry = 0
+
+print(gc.mem_free())
+
 while True:
+    now = time.monotonic()
+    if (not nc) and (now - nc_last_retry >= nc_retry_delay):
+        nc_last_retry = now
+        print("Checking Nunchuk")
+        try:
+            nc = Nunchuk(board.I2C())
+            print("Nunchuck Found")
+            status_led.value = True
+        except ValueError:
+            print("Nunchuk Missing")
+            status_led.value = False
+
     caps = read_caps()
     # print(caps)
     # light up the matching LED
@@ -138,4 +159,38 @@ while True:
             kbd.send(0x06)  # C
             kbd.send(0x21)  # 4
             kbd.send(0x28)  # ENTER
-    time.sleep(0.1)
+
+    if nc:
+        try:
+            jX = nc.joystick.x
+            jY = nc.joystick.y
+            x = jX - 128
+            y = jY - 128
+            if x < -127: x = -127
+            if y < -127: y = -127
+
+            x = (sensitivity * (jX - 127) // 255)
+            y = (sensitivity * (jY - 127) // 255)
+
+            mouse.move(x, -y)
+
+            if nc.buttons.Z:
+                if do_clicks:
+                    mouse.press(Mouse.LEFT_BUTTON)
+                left_down = True
+            elif left_down:
+                if do_clicks:
+                    mouse.release(Mouse.LEFT_BUTTON)
+                left_down = False
+
+            if nc.buttons.C:
+                if do_clicks:
+                    mouse.press(Mouse.RIGHT_BUTTON)
+                right_down = True
+            elif right_down:
+                if do_clicks:
+                    mouse.release(Mouse.RIGHT_BUTTON)
+                right_down = False
+        except OSError:
+            print("Nunchuk Gone")
+            nc = None

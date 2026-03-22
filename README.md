@@ -4,7 +4,7 @@ Experiments with PyRuler (CircuitPython on SAMD21) and Wii Nuchuck
 
 ## Hardware
 
-I had an [Adafruit PyRuler](https://www.adafruit.com/product/4319) and Wii Nunchuck with a broken plug, and then dicovered the [Adafruit Wii Nunchuck Breakout](https://www.adafruit.com/product/4836). I soldered the Adafruit breakout directly to the PyRuler get both a Stemma QT port and to be able to test with a good Nunchuck. Then soldered the damaged Nunchuck and to half of a short Stemma QT cable to plug directly into the breakout.
+I had an [Adafruit PyRuler](https://www.adafruit.com/product/4319) and Wii Nunchuck with a broken plug, and then dicovered the [Adafruit Wii Nunchuck Breakout](https://www.adafruit.com/product/4836). I soldered the Adafruit breakout directly to the PyRuler get both a Stemma QT port and to be able to test with a good Nunchuck. Then soldered the damaged Nunchuck to half of a shorty Stemma QT cable to plug directly into the breakout.
 
 ## Software
 Duplicated the original PyRuler [CircuitPython](https://circuitpython.org/) program with additions of sending τ (tau) on the "Digikey" touchpadand some tweaks to the LED lighting and key repeats. I used the [WiiChuck Library](https://github.com/jfurcean/CircuitPython_WiiChuck) to read the Nunchuck and then send USB HID commands.

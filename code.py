@@ -71,13 +71,13 @@ while True:
     now = monotonic()
     if (not nc) and (now - nc_last_retry >= nc_retry_delay):
         nc_last_retry = now
-        # print("Checking Nunchuk")
+        # print("Checking Nunchuck")
         try:
             nc = Nunchuk(board.I2C())
-            # print("Nunchuk Found")
+            # print("Nunchuck Found")
             status_led.value = True
         except ValueError:
-            # print("Nunchuk Missing")
+            # print("Nunchuck Missing")
             status_led.value = False
 
     for led in leds:
@@ -163,7 +163,7 @@ while True:
                     mouse.release(Mouse.RIGHT_BUTTON)
                 right_down = False
         except OSError:
-            # print("Nunchuk Gone")
+            # print("Nunchuck Gone")
             nc = None
 
     sleep(0.001)

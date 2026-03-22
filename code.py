@@ -24,8 +24,6 @@ do_clicks = True
 left_down = False
 right_down = False
 
-
-
 status_led = DigitalInOut(board.LED)
 status_led.direction = Direction.OUTPUT
 

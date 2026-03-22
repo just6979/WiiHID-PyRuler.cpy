@@ -12,3 +12,7 @@ Duplicated the original PyRuler [CircuitPython](https://circuitpython.org/) prog
 ## Notes
 
 It was interesting managing memory in the limited space left on the SAMD21 microcontroller when running CircuitPython. I ended up inlining the specifically needed keycodes just to fit the mouse functionality in. I then had to remove the Windows and Mac keycode sending functions in order to make room for handling a middle click when pressing both Nunchuck buttons. THe middle button stuff could probably use a debouncing, but the Adafruit Debouncer library took too much memory! As did trying to switch to emulating a gamepad with the Adafruit HID library and examples , but also ran into memory limitations. Either could probably be done with some effort, but I'm continuing on with Arduino/PlatformIO on a [QT Py M0](https://www.adafruit.com/product/4600) for further experimentation with Wii Nunchucks and other accessories.
+
+### Further Reading
+
+https://github.com/just6979/WiiHID_QT-Py-M0.pio

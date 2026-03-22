@@ -18,6 +18,7 @@ sensitivity = 33
 do_clicks = True
 left_down = False
 right_down = False
+middle_down = False
 
 nc = None
 
@@ -137,6 +138,13 @@ while True:
             y = (sensitivity * (nc.joystick.y - 127) // 255)
             mouse.move(x, -y)
 
+            if nc.buttons.Z and nc.buttons.C:
+                if do_clicks:
+                    mouse.press(Mouse.MIDDLE_BUTTON)
+                middle_down = True
+            elif middle_down:
+                mouse.release(Mouse.MIDDLE_BUTTON)
+                middle_down = False
             if nc.buttons.Z:
                 if do_clicks:
                     mouse.press(Mouse.LEFT_BUTTON)

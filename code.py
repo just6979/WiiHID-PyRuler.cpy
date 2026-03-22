@@ -1,6 +1,6 @@
 import gc
-import os
-import time
+from time import sleep, monotonic
+
 import board
 import touchio
 import usb_hid
@@ -16,7 +16,7 @@ LINUX = "L"  # and Chrome OS
 # Set your computer type to one of the above
 OS = LINUX
 
-print(dir(board), os.uname()) # Print a little about ourselves
+print(board.board_id)
 
 kbd = Keyboard(usb_hid.devices)
 mouse = Mouse(usb_hid.devices)
@@ -39,17 +39,16 @@ for p in (board.LED4, board.LED5, board.LED6, board.LED7):
     led = DigitalInOut(p)
     led.direction = Direction.OUTPUT
     led.value = True
-    time.sleep(0.1)
+    sleep(0.1)
     leds.append(led)
 for led in reversed(leds):
     led.value = False
-    time.sleep(0.1)
+    sleep(0.1)
 
 cap_touches = [False, False, False, False]
 
 
 def read_caps():
-    t0_count = 0
     t0 = touches[0]
     t0.direction = Direction.OUTPUT
     t0.value = True
@@ -86,16 +85,16 @@ nc_last_retry = 0
 print(gc.mem_free())
 
 while True:
-    now = time.monotonic()
+    now = monotonic()
     if (not nc) and (now - nc_last_retry >= nc_retry_delay):
         nc_last_retry = now
         print("Checking Nunchuk")
         try:
             nc = Nunchuk(board.I2C())
-            print("Nunchuck Found")
+            # print("Nunchuk Found")
             status_led.value = True
         except ValueError:
-            print("Nunchuk Missing")
+            # print("Nunchuk Missing")
             status_led.value = False
 
     caps = read_caps()
@@ -162,16 +161,8 @@ while True:
 
     if nc:
         try:
-            jX = nc.joystick.x
-            jY = nc.joystick.y
-            x = jX - 128
-            y = jY - 128
-            if x < -127: x = -127
-            if y < -127: y = -127
-
-            x = (sensitivity * (jX - 127) // 255)
-            y = (sensitivity * (jY - 127) // 255)
-
+            x = (sensitivity * (nc.joystick.x - 127) // 255)
+            y = (sensitivity * (nc.joystick.y - 127) // 255)
             mouse.move(x, -y)
 
             if nc.buttons.Z:
@@ -192,5 +183,5 @@ while True:
                     mouse.release(Mouse.RIGHT_BUTTON)
                 right_down = False
         except OSError:
-            print("Nunchuk Gone")
+            # print("Nunchuk Gone")
             nc = None
